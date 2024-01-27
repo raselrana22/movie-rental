@@ -2,19 +2,22 @@ import Delete from "../assets/delete.svg";
 import CheckOut from "../assets/icons/checkout.svg";
 
 import { useContext } from "react";
+import { toast } from "react-toastify";
 import { MovieContext } from "../context";
 import { getImageUrl } from "../utils/movie-utils";
 
 export default function CardDetails({ onClose }) {
-  const { cartData, setCartData } = useContext(MovieContext);
+  const { state, dispatch } = useContext(MovieContext);
 
-  function handleRemoveItem(e, itemId) {
+  function handleRemoveItem(e, item) {
     e.preventDefault();
-    const filtered = cartData.filter((item) => {
-      return item.id !== itemId;
+    dispatch({
+      type: "Remove_To_Cart",
+      payload: item,
     });
-
-    setCartData([...filtered]);
+    toast.success(`Movie ${item.title} removed successfully`, {
+      position: "bottom-right",
+    });
   }
   return (
     <div className="fixed top-0 left-0 w-screen h-screen z-50 bg-black/60 backdrop-blur-sm">
@@ -23,11 +26,11 @@ export default function CardDetails({ onClose }) {
           <h2 className="text-2xl lg:text-[30px] mb-10 font-bold">
             Your Carts
           </h2>
-          {cartData.length === 0 ? (
+          {state.cartData.length === 0 ? (
             <p className="text-xl">The cart is empty</p>
           ) : (
             <div className="space-y-8 lg:space-y-12 max-h-[450px] overflow-auto mb-10 lg:mb-14">
-              {cartData.map((item) => (
+              {state.cartData.map((item) => (
                 <div key={item.id} className="grid grid-cols-[1fr_auto] gap-4">
                   <div className="flex items-center gap-4">
                     <img
@@ -49,7 +52,7 @@ export default function CardDetails({ onClose }) {
                     <button
                       className="bg-[#D42967] rounded-md p-2 md:px-4 inline-flex 
                   items-center space-x-2 text-white"
-                      onClick={(e) => handleRemoveItem(e, item.id)}
+                      onClick={(e) => handleRemoveItem(e, item)}
                     >
                       <img className="w-5 h-5" src={Delete} alt="delete" />
                       <span className="max-md:hidden">Remove</span>
